@@ -1,0 +1,58 @@
+/**
+ * Los 48 clasificados al Mundial 2026 con bandera emoji y ranking FIFA aproximado.
+ * Ordenados por fifaRanking ascendente (1 = mejor).
+ * Los nombres deben coincidir exactamente con los que usa la API del backend.
+ */
+export const TEAMS = [
+  { name: "Argentina",     flag: "🇦🇷", fifaRanking: 1  },
+  { name: "France",        flag: "🇫🇷", fifaRanking: 2  },
+  { name: "Spain",         flag: "🇪🇸", fifaRanking: 3  },
+  { name: "England",       flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", fifaRanking: 4  },
+  { name: "Brazil",        flag: "🇧🇷", fifaRanking: 5  },
+  { name: "Belgium",       flag: "🇧🇪", fifaRanking: 6  },
+  { name: "Portugal",      flag: "🇵🇹", fifaRanking: 7  },
+  { name: "Netherlands",   flag: "🇳🇱", fifaRanking: 8  },
+  { name: "Italy",         flag: "🇮🇹", fifaRanking: 9  },
+  { name: "Colombia",      flag: "🇨🇴", fifaRanking: 10 },
+  { name: "United States", flag: "🇺🇸", fifaRanking: 11 },
+  { name: "Croatia",       flag: "🇭🇷", fifaRanking: 12 },
+  { name: "Germany",       flag: "🇩🇪", fifaRanking: 13 },
+  { name: "Morocco",       flag: "🇲🇦", fifaRanking: 14 },
+  { name: "Mexico",        flag: "🇲🇽", fifaRanking: 15 },
+  { name: "Uruguay",       flag: "🇺🇾", fifaRanking: 16 },
+  { name: "Japan",         flag: "🇯🇵", fifaRanking: 17 },
+  { name: "Switzerland",   flag: "🇨🇭", fifaRanking: 18 },
+  { name: "Serbia",        flag: "🇷🇸", fifaRanking: 22 },
+  { name: "South Korea",   flag: "🇰🇷", fifaRanking: 23 },
+  { name: "Australia",     flag: "🇦🇺", fifaRanking: 25 },
+  { name: "Poland",        flag: "🇵🇱", fifaRanking: 26 },
+  { name: "Ukraine",       flag: "🇺🇦", fifaRanking: 28 },
+  { name: "Senegal",       flag: "🇸🇳", fifaRanking: 29 },
+  { name: "Iran",          flag: "🇮🇷", fifaRanking: 32 },
+  { name: "Tunisia",       flag: "🇹🇳", fifaRanking: 35 },
+  { name: "Nigeria",       flag: "🇳🇬", fifaRanking: 36 },
+  { name: "Egypt",         flag: "🇪🇬", fifaRanking: 38 },
+  { name: "Peru",          flag: "🇵🇪", fifaRanking: 39 },
+  { name: "Canada",        flag: "🇨🇦", fifaRanking: 40 },
+  { name: "Chile",         flag: "🇨🇱", fifaRanking: 43 },
+  { name: "Ecuador",       flag: "🇪🇨", fifaRanking: 44 },
+  { name: "Cameroon",      flag: "🇨🇲", fifaRanking: 45 },
+  { name: "Panama",        flag: "🇵🇦", fifaRanking: 47 },
+  { name: "Costa Rica",    flag: "🇨🇷", fifaRanking: 52 },
+  { name: "Jamaica",       flag: "🇯🇲", fifaRanking: 53 },
+  { name: "Saudi Arabia",  flag: "🇸🇦", fifaRanking: 55 },
+  { name: "Algeria",       flag: "🇩🇿", fifaRanking: 56 },
+  { name: "Ivory Coast",   flag: "🇨🇮", fifaRanking: 59 },
+  { name: "South Africa",  flag: "🇿🇦", fifaRanking: 66 },
+  { name: "Uzbekistan",    flag: "🇺🇿", fifaRanking: 70 },
+  { name: "Venezuela",     flag: "🇻🇪", fifaRanking: 71 },
+  { name: "Honduras",      flag: "🇭🇳", fifaRanking: 81 },
+  { name: "Bolivia",       flag: "🇧🇴", fifaRanking: 85 },
+  { name: "Bahrain",       flag: "🇧🇭", fifaRanking: 86 },
+  { name: "Guatemala",     flag: "🇬🇹", fifaRanking: 90 },
+  { name: "New Zealand",   flag: "🇳🇿", fifaRanking: 92 },
+  { name: "Indonesia",     flag: "🇮🇩", fifaRanking: 130 },
+]
+
+/** Lookup rápido por nombre para obtener bandera y ranking. */
+export const TEAM_LOOKUP = Object.fromEntries(TEAMS.map((t) => [t.name, t]))

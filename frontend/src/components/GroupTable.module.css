@@ -1,0 +1,107 @@
+.container {
+  max-width: 960px;
+}
+
+.title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+}
+
+.subtitle {
+  color: var(--color-text-muted);
+  margin-bottom: 2rem;
+  font-size: 0.95rem;
+}
+
+.loading,
+.error {
+  text-align: center;
+  padding: 3rem;
+  color: var(--color-text-muted);
+}
+
+.error { color: var(--color-danger); }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.groupCard {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.groupHeader {
+  background: var(--color-primary);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 0.5rem 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.table th {
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.table td {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid rgba(55, 65, 81, 0.5);
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.qualifier td:first-child {
+  border-left: 3px solid var(--color-success);
+}
+
+.teamCell {
+  font-weight: 500;
+}
+
+.predicted {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.probCell {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.probBar {
+  height: 6px;
+  background: var(--color-primary);
+  border-radius: 999px;
+  max-width: 60px;
+  min-width: 2px;
+  transition: width 0.5s ease;
+}
+
+.probCell span {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  min-width: 28px;
+}

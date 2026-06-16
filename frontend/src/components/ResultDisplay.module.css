@@ -1,0 +1,160 @@
+.container {
+  margin-top: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.sectionTitle {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+  margin-bottom: -0.5rem;
+}
+
+/* ── Tres cards de probabilidad ──────────────────────────────────────────── */
+.probCards {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.probCard {
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1rem 0.75rem;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+
+.probCardFav {
+  background: var(--color-header);
+  border-color: var(--color-header);
+}
+
+.probCardLabel {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  margin-bottom: 0.4rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.probCardFav .probCardLabel {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.probCardValue {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--color-text);
+}
+
+.probCardFav .probCardValue {
+  color: var(--color-gold);
+}
+
+/* ── Barras animadas ─────────────────────────────────────────────────────── */
+.bars {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.barRow {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.barLabel {
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+  width: 100px;
+  flex-shrink: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.barTrack {
+  flex: 1;
+  height: 8px;
+  background: var(--color-border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.bar {
+  height: 100%;
+  background: var(--color-header);
+  border-radius: 999px;
+  width: 0%;
+}
+
+.barPct {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-text);
+  width: 3.5rem;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* ── Cards de goles esperados ────────────────────────────────────────────── */
+.goalsCards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.goalsCard {
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1rem;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+
+.goalsFlag {
+  font-size: 1.75rem;
+  margin-bottom: 0.25rem;
+}
+
+.goalsTeam {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  margin-bottom: 0.3rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.goalsValue {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--color-text);
+  letter-spacing: -0.02em;
+}
+
+.goalsCI {
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+  margin-top: 0.25rem;
+}
+
+/* ── Nota simulaciones ───────────────────────────────────────────────────── */
+.simNote {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  text-align: center;
+  font-style: italic;
+  margin-top: -0.25rem;
+}

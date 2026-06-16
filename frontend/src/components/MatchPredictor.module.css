@@ -1,0 +1,232 @@
+.container {
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 0.25rem;
+}
+
+.subtitle {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  margin-bottom: 1.5rem;
+}
+
+/* ── Selectores ──────────────────────────────────────────────────────────── */
+.teamsRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.teamBlock {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+}
+
+.selectWrapper {
+  position: relative;
+}
+
+.select {
+  width: 100%;
+  padding: 0.6rem 2rem 0.6rem 0.85rem;
+  background: var(--color-surface-2);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  color: var(--color-text);
+  appearance: none;
+  cursor: pointer;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.select:focus {
+  outline: none;
+  border-color: var(--color-header);
+  box-shadow: 0 0 0 3px rgba(26, 26, 46, 0.12);
+}
+
+.selectWrapper::after {
+  content: '▾';
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  pointer-events: none;
+}
+
+.rankPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: #fef3c7;
+  border: 1px solid #fde68a;
+  color: #92400e;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.vsLabel {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--color-text-muted);
+  padding-top: 2rem;
+  flex-shrink: 0;
+}
+
+/* ── Toggle sede neutral ─────────────────────────────────────────────────── */
+.neutralToggle {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1.25rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.toggle {
+  width: 36px;
+  height: 20px;
+  border-radius: 999px;
+  background: var(--color-border);
+  flex-shrink: 0;
+  position: relative;
+  transition: background var(--transition);
+  cursor: pointer;
+}
+
+.toggle::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  transition: transform var(--transition);
+}
+
+.toggleOn {
+  background: var(--color-header);
+}
+
+.toggleOn::after {
+  transform: translateX(16px);
+}
+
+.toggleLabel {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+/* ── Botón predecir ──────────────────────────────────────────────────────── */
+.predictBtn {
+  width: 100%;
+  padding: 0.85rem;
+  background: var(--color-header);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  border-radius: var(--radius-sm);
+  transition: opacity var(--transition), transform var(--transition);
+  letter-spacing: 0.01em;
+}
+
+.predictBtn:hover:not(:disabled) {
+  opacity: 0.88;
+  transform: translateY(-1px);
+}
+
+.predictBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ── Skeleton loader ─────────────────────────────────────────────────────── */
+.skeleton {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1 }
+  50% { opacity: 0.4 }
+}
+
+.skeletonRow {
+  height: 20px;
+  background: var(--color-border);
+  border-radius: var(--radius-sm);
+  width: 50%;
+  margin: 0 auto;
+}
+
+.skeletonCards {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.skeletonCard {
+  height: 80px;
+  background: var(--color-border);
+  border-radius: var(--radius);
+}
+
+.skeletonBar {
+  height: 12px;
+  background: var(--color-border);
+  border-radius: 999px;
+}
+
+/* ── Error ───────────────────────────────────────────────────────────────── */
+.error {
+  margin-top: 1rem;
+  background: #fee2e2;
+  border: 1px solid #fca5a5;
+  color: #dc2626;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .teamsRow {
+    flex-direction: column;
+  }
+
+  .vsLabel {
+    padding-top: 0;
+    text-align: center;
+    align-self: center;
+  }
+}

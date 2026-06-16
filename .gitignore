@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.env
+venv/
+.venv/
+*.egg-info/
+dist/
+build/
+
+# Artefactos del modelo (archivos grandes → usar Git LFS o almacenamiento externo)
+model/posterior.nc
+model/teams.csv
+data/raw/
+data/processed/
+reports/
+
+# Node / frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+
+# Jupyter
+.ipynb_checkpoints/
+notebooks/.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db

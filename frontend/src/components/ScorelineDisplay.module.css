@@ -1,0 +1,213 @@
+.container {
+  animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.sectionTitle {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+  margin-bottom: 0.75rem;
+}
+
+/* ── Heatmap ─────────────────────────────────────────────────────── */
+.heatmapWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.awayAxisLabel {
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  padding-left: 2.4rem; /* offset para compensar la etiqueta del eje Y */
+  margin-bottom: 0.15rem;
+}
+
+.heatmapInner {
+  display: flex;
+  flex-direction: column;
+}
+
+.colHeader {
+  display: flex;
+  align-items: center;
+  padding-left: 2.4rem; /* ancho etiqueta eje Y + col índice */
+}
+
+.cornerCell {
+  width: 2rem;
+  flex-shrink: 0;
+}
+
+.axisCell {
+  flex: 1;
+  min-width: 0;
+  text-align: center;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  padding: 0.2rem 0;
+}
+
+.gridRows {
+  display: flex;
+  align-items: stretch;
+}
+
+.homeAxisLabel {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transform: rotate(180deg);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  padding: 0 0.25rem;
+  white-space: nowrap;
+}
+
+.grid {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.row {
+  display: flex;
+  align-items: stretch;
+  gap: 2px;
+}
+
+.cell {
+  flex: 1;
+  min-width: 0;
+  aspect-ratio: 1 / 0.9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.68rem;
+  font-weight: 600;
+  border-radius: 3px;
+  cursor: default;
+  position: relative;
+  transition: filter 0.15s ease;
+  user-select: none;
+}
+
+.cell:hover {
+  filter: brightness(1.15);
+  z-index: 2;
+}
+
+.cellMax {
+  outline: 1.5px solid #c8102e;
+  outline-offset: -1px;
+  z-index: 1;
+}
+
+.tooltip {
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.85);
+  color: #fff;
+  font-size: 0.7rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* ── Ranking ─────────────────────────────────────────────────────── */
+.rankList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.rankRow {
+  display: grid;
+  grid-template-columns: 1.6rem 3.4rem 4.8rem 1fr 3rem;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.rankPos {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background: var(--color-surface-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+.rankFirst {
+  background: #e8c84a;
+  color: #1a1a2e;
+}
+
+.scoreBadge {
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 0.2rem 0.5rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.outcomeTag {
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.barTrack {
+  height: 7px;
+  background: var(--color-surface-2);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.rankBar {
+  height: 100%;
+  background: #c8102e;
+  border-radius: 999px;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.rankPct {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-align: right;
+}
+
+@media (max-width: 420px) {
+  .cell {
+    font-size: 0.58rem;
+  }
+  .rankRow {
+    grid-template-columns: 1.4rem 3rem 4rem 1fr 2.6rem;
+    gap: 0.3rem;
+  }
+}

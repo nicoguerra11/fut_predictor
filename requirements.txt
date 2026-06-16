@@ -1,0 +1,10 @@
+pymc>=5.0.0
+arviz>=0.17.0
+fastapi>=0.110.0
+uvicorn[standard]
+httpx
+pandas
+numpy
+python-dotenv
+scipy
+matplotlib

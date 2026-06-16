@@ -1,0 +1,66 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  /* Tema claro — fondo blanco/neutro según spec */
+  --color-bg: #f0f2f5;
+  --color-surface: #ffffff;
+  --color-surface-2: #f8fafc;
+  --color-border: #e2e8f0;
+
+  /* Paleta FIFA */
+  --color-header: #1a1a2e;
+  --color-badge: #c8102e;
+  --color-gold: #e8c84a;
+
+  /* Texto */
+  --color-text: #1a1a2e;
+  --color-text-muted: #64748b;
+  --color-text-inverse: #f9fafb;
+
+  /* Utilidades */
+  --color-success: #16a34a;
+  --color-danger: #dc2626;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 24px rgba(0, 0, 0, 0.12);
+  --transition: 0.25s ease;
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a {
+  color: var(--color-header);
+  text-decoration: none;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  outline: none;
+  font-family: inherit;
+}
+
+select {
+  font-family: inherit;
+}
+
+h1, h2, h3 {
+  line-height: 1.2;
+}

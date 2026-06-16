@@ -1,0 +1,110 @@
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ── Header ──────────────────────────────────────────────────────────────── */
+.header {
+  background: var(--color-header);
+  padding: 0 1.25rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.headerInner {
+  max-width: 680px;
+  margin: 0 auto;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.logoIcon {
+  font-size: 1.4rem;
+}
+
+.logo h1 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+}
+
+.badge {
+  background: var(--color-badge);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+/* ── Nav tabs ─────────────────────────────────────────────────────────────── */
+.nav {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.navBtn {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 0.35rem 0.8rem;
+  border-radius: var(--radius-sm);
+  transition: color var(--transition), background var(--transition);
+}
+
+.navBtn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.navBtn.active {
+  color: var(--color-gold);
+  background: rgba(232, 200, 74, 0.12);
+}
+
+/* ── Main content ─────────────────────────────────────────────────────────── */
+.main {
+  flex: 1;
+  max-width: 680px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 1.75rem 1.25rem;
+}
+
+/* ── Error banner ─────────────────────────────────────────────────────────── */
+.errorBanner {
+  background: #fee2e2;
+  border: 1px solid #fca5a5;
+  color: var(--color-danger);
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-sm);
+  margin-bottom: 1.25rem;
+  font-size: 0.875rem;
+}
+
+/* ── Footer ───────────────────────────────────────────────────────────────── */
+.footer {
+  text-align: center;
+  padding: 1.25rem;
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+  border-top: 1px solid var(--color-border);
+  background: var(--color-surface);
+}

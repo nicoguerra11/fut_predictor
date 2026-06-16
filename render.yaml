@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: world-cup-predictor-api
+    runtime: python
+    region: oregon
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn api.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: FOOTBALL_DATA_API_KEY
+        sync: false          # se setea manualmente en el dashboard de Render
+      - key: ALLOWED_ORIGINS
+        sync: false
+    disk:
+      name: model-artifacts
+      mountPath: /opt/render/project/src/model
+      sizeGB: 1              # para almacenar la posterior .nc
