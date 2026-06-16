@@ -1,6 +1,6 @@
-requirements.txt
-api/
-model/
-data/
-notebooks/
-render.yaml
+/requirements.txt
+/api/
+/model/
+/data/
+/notebooks/
+/render.yaml
