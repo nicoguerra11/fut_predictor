@@ -12,7 +12,6 @@ import logging
 from dataclasses import dataclass
 from pathlib import Path
 
-import arviz as az
 import numpy as np
 import pandas as pd
 from scipy.stats import poisson as scipy_poisson
@@ -21,7 +20,7 @@ log = logging.getLogger(__name__)
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 MODEL_DIR = BASE_DIR / "model"
-POSTERIOR_PATH = MODEL_DIR / "posterior.nc"
+POSTERIOR_PATH = MODEL_DIR / "posterior.npz"
 TEAMS_PATH = MODEL_DIR / "teams.csv"
 
 N_SIMULATIONS = 4000
@@ -61,14 +60,14 @@ class Predictor:
     ) -> None:
         self._posterior_path = posterior_path or POSTERIOR_PATH
         self._teams_path = teams_path or TEAMS_PATH
-        self._idata: az.InferenceData | None = None
+        self._samples: dict[str, np.ndarray] | None = None
         self._team_to_idx: dict[str, int] = {}
         self._teams: list[str] = []
         self._default_idx: int = 0
 
     def _load(self) -> None:
         """Carga lazy de la posterior y el índice de equipos."""
-        if self._idata is not None:
+        if self._samples is not None:
             return
 
         if not self._posterior_path.exists():
@@ -82,16 +81,21 @@ class Predictor:
             )
 
         log.info(f"Cargando posterior desde {self._posterior_path}...")
-        self._idata = az.from_netcdf(str(self._posterior_path))
+        data = np.load(str(self._posterior_path))
+        self._samples = {
+            "mu": data["mu"],
+            "alpha": data["alpha"],
+            "gamma": data["gamma"],
+            "ataque": data["ataque"],
+            "defensa": data["defensa"],
+        }
 
         teams_df = pd.read_csv(self._teams_path)
         self._teams = teams_df["equipo"].tolist()
         self._team_to_idx = dict(zip(teams_df["equipo"], teams_df["idx"]))
-
-        # Índice de la media global para equipos desconocidos
-        n_teams = len(self._teams)
-        self._default_idx = n_teams // 2
-        log.info(f"Posterior cargada: {n_teams} equipos indexados")
+        self._default_idx = len(self._teams) // 2
+        n_samples = len(data["mu"])
+        log.info(f"Posterior cargada: {len(self._teams)} equipos, {n_samples} muestras bootstrap")
 
     def get_teams(self) -> list[str]:
         """Retorna la lista de equipos conocidos por el modelo."""
@@ -109,28 +113,10 @@ class Predictor:
             return self._default_idx
         return idx
 
-    def _extract_posterior_samples(self) -> dict[str, np.ndarray]:
-        """
-        Extrae y aplana las muestras de la posterior.
-        Retorna arrays de forma (n_samples,) para parámetros escalares
-        y (n_samples, n_teams) para los efectos por equipo.
-        """
-        posterior = self._idata.posterior
-        n_chains = posterior.sizes["chain"]
-        n_draws = posterior.sizes["draw"]
-        n_total = n_chains * n_draws
-
-        def flatten(var: str) -> np.ndarray:
-            arr = posterior[var].values  # (chains, draws, ...)
-            return arr.reshape(n_total, *arr.shape[2:])
-
-        return {
-            "mu": flatten("mu"),
-            "alpha": flatten("alpha"),
-            "gamma": flatten("gamma"),
-            "ataque": flatten("ataque"),
-            "defensa": flatten("defensa"),
-        }
+    def _get_samples(self) -> dict[str, np.ndarray]:
+        """Retorna una copia de las muestras de la posterior."""
+        assert self._samples is not None
+        return dict(self._samples)
 
     def predict(
         self,
@@ -161,14 +147,14 @@ class Predictor:
         home_idx = self._get_idx(team_home)
         away_idx = self._get_idx(team_away)
 
-        samples = self._extract_posterior_samples()
+        samples = self._get_samples()
 
-        # Subsamplear si n_simulations < n_total para mayor velocidad
+        # Si tenemos menos muestras que n_simulations, samplear con reemplazo
         n_total = len(samples["mu"])
-        if n_simulations < n_total:
-            rng = np.random.default_rng(seed=42)
-            idxs = rng.choice(n_total, size=n_simulations, replace=False)
-            samples = {k: v[idxs] for k, v in samples.items()}
+        rng = np.random.default_rng(seed=42)
+        if n_simulations != n_total:
+            idxs = rng.choice(n_total, size=n_simulations, replace=True)
+            samples = {k: v[idxs] if v.ndim == 1 else v[idxs] for k, v in samples.items()}
 
         # Δranking normalizado
         r_home = ranking_home or 50
@@ -192,13 +178,13 @@ class Predictor:
             + samples["alpha"] * delta_away
         )
 
-        lambda_home = np.exp(log_lambda_home)
-        lambda_away = np.exp(log_lambda_away)
+        lambda_home = np.exp(np.clip(log_lambda_home, -10, 10))
+        lambda_away = np.exp(np.clip(log_lambda_away, -10, 10))
 
         # Simular goles desde Poisson
-        rng = np.random.default_rng(seed=0)
-        simulated_home = rng.poisson(lambda_home)
-        simulated_away = rng.poisson(lambda_away)
+        rng2 = np.random.default_rng(seed=0)
+        simulated_home = rng2.poisson(lambda_home)
+        simulated_away = rng2.poisson(lambda_away)
 
         # Probabilidades de resultado
         prob_home = float(np.mean(simulated_home > simulated_away))
@@ -227,19 +213,14 @@ class Predictor:
 
         # Distribución de goles (0 a 8 para la UI)
         max_goals = 9
-        dist_home = [
-            float(np.mean(simulated_home == g)) for g in range(max_goals)
-        ]
-        dist_away = [
-            float(np.mean(simulated_away == g)) for g in range(max_goals)
-        ]
+        dist_home = [float(np.mean(simulated_home == g)) for g in range(max_goals)]
+        dist_away = [float(np.mean(simulated_away == g)) for g in range(max_goals)]
 
         # Grid de probabilidades 6×6 (marcadores exactos 0-0 a 5-5)
-        # P(home=i, away=j) = media sobre muestras de Poisson.pmf(i,λ_h)·Poisson.pmf(j,λ_a)
         goals_range = np.arange(6)
-        pmf_home_grid = scipy_poisson.pmf(goals_range[None, :], lambda_home[:, None])  # (n, 6)
-        pmf_away_grid = scipy_poisson.pmf(goals_range[None, :], lambda_away[:, None])  # (n, 6)
-        grid = np.einsum("ni,nj->ij", pmf_home_grid, pmf_away_grid) / len(lambda_home)  # (6, 6)
+        pmf_home_grid = scipy_poisson.pmf(goals_range[None, :], lambda_home[:, None])
+        pmf_away_grid = scipy_poisson.pmf(goals_range[None, :], lambda_away[:, None])
+        grid = np.einsum("ni,nj->ij", pmf_home_grid, pmf_away_grid) / len(lambda_home)
         total_grid = grid.sum()
         scorelines = sorted(
             [
@@ -278,5 +259,3 @@ if __name__ == "__main__":
     print(f"  P(visit.) = {result.prob_away:.1%}")
     print(f"  Goles esperados: {result.expected_goals_home:.2f} – {result.expected_goals_away:.2f}")
     print(f"  Resultado más probable: {result.most_likely_score_home}-{result.most_likely_score_away}")
-    print(f"  IC 89% local:    {result.credible_interval_home}")
-    print(f"  IC 89% visitante: {result.credible_interval_away}")
