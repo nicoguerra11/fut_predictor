@@ -62,19 +62,21 @@ COMPETITIVE_TOURNAMENTS = {
 START_YEAR = 2018
 
 # Rankings FIFA aproximados de los 48 clasificados al Mundial 2026
+# Sorteo oficial: 11 de junio de 2026
 _FALLBACK_FIFA_RANKINGS: dict[str, int] = {
-    "Argentina": 1, "France": 2, "Spain": 3, "England": 4,
-    "Brazil": 5, "Belgium": 6, "Portugal": 7, "Netherlands": 8,
-    "Italy": 9, "Colombia": 10, "United States": 11, "Croatia": 12,
-    "Germany": 13, "Morocco": 14, "Mexico": 15, "Uruguay": 16,
-    "Japan": 17, "Switzerland": 18, "Iran": 22, "South Korea": 24,
-    "Australia": 25, "Poland": 26, "Ukraine": 28, "Senegal": 29,
-    "Serbia": 33, "Tunisia": 35, "Nigeria": 36, "Egypt": 38,
-    "Peru": 39, "Canada": 40, "Chile": 43, "Ecuador": 44,
-    "Cameroon": 45, "Panama": 47, "Costa Rica": 52, "Jamaica": 53,
-    "Saudi Arabia": 55, "Algeria": 56, "Ivory Coast": 59, "South Africa": 66,
-    "Uzbekistan": 70, "Venezuela": 71, "Honduras": 81, "Bolivia": 85,
-    "Bahrain": 86, "Guatemala": 90, "New Zealand": 92, "Indonesia": 130,
+    "Argentina": 1,   "France": 2,      "Spain": 3,       "England": 4,
+    "Brazil": 5,      "Belgium": 6,     "Portugal": 7,    "Netherlands": 8,
+    "Colombia": 10,   "United States": 11, "Croatia": 12, "Germany": 13,
+    "Morocco": 14,    "Japan": 15,      "Mexico": 16,     "Uruguay": 17,
+    "Switzerland": 19, "Sweden": 20,   "South Korea": 22, "Scotland": 24,
+    "Australia": 25,  "Austria": 26,   "Turkey": 28,      "Senegal": 29,
+    "Norway": 31,     "Iran": 33,      "Czechia": 37,     "Tunisia": 38,
+    "Egypt": 40,      "Canada": 42,    "Ecuador": 44,     "Panama": 48,
+    "Paraguay": 51,   "Saudi Arabia": 55, "Algeria": 58,
+    "Bosnia and Herzegovina": 60, "Ivory Coast": 61, "Ghana": 63,
+    "Cape Verde": 66, "South Africa": 68, "Iraq": 69,    "Uzbekistan": 72,
+    "DR Congo": 74,   "Qatar": 76,     "Curaçao": 85,    "Jordan": 88,
+    "New Zealand": 92, "Haiti": 112,
 }
 
 # Normalización de nombres: unifica variantes hacia el nombre usado en teams.js
@@ -87,10 +89,15 @@ _NAME_NORM: dict[str, str] = {
     "Bosnia & Herzegovina": "Bosnia and Herzegovina",
     "Korea DPR": "North Korea",
     "Trinidad and Tobago": "Trinidad & Tobago",
+    # DR Congo: el CSV de martj42 puede usar "Congo DR"
+    "Congo DR": "DR Congo",
+    "Democratic Republic of the Congo": "DR Congo",
+    # Curaçao: variante sin tilde
+    "Curacao": "Curaçao",
     # Ivory Coast: el CSV usa el nombre francés con apóstrofe Unicode
-    "Côte d'Ivoire": "Ivory Coast",       # ASCII apostrophe
+    "Côte d’Ivoire": "Ivory Coast",       # ASCII apostrophe
     "Côte d’Ivoire": "Ivory Coast",  # Unicode right single quote
-    "Cote d'Ivoire": "Ivory Coast",
+    "Cote d’Ivoire": "Ivory Coast",
 }
 
 

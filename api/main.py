@@ -30,21 +30,20 @@ load_dotenv()
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 log = logging.getLogger(__name__)
 
-# ── Grupos del Mundial 2026 (48 equipos, 12 grupos de 4) ─────────────────────
-# Ajustar según el sorteo real cuando esté disponible
+# ── Grupos del Mundial 2026 — sorteo oficial 11 de junio de 2026 ─────────────
 WC_2026_GROUPS: dict[str, list[str]] = {
-    "A": ["United States", "Uruguay", "Panama", "Bolivia"],
-    "B": ["Argentina", "Chile", "Peru", "Canada"],
-    "C": ["Germany", "Japan", "Morocco", "Australia"],
-    "D": ["Spain", "Croatia", "Netherlands", "Senegal"],
-    "E": ["France", "Belgium", "Mexico", "Ecuador"],
-    "F": ["England", "Portugal", "Colombia", "Tunisia"],
-    "G": ["Brazil", "Switzerland", "Serbia", "Cameroon"],
-    "H": ["Italy", "Poland", "Costa Rica", "Ivory Coast"],
-    "I": ["Saudi Arabia", "Egypt", "Algeria", "New Zealand"],
-    "J": ["South Korea", "Nigeria", "South Africa", "Guatemala"],
-    "K": ["Iran", "Venezuela", "Jamaica", "Indonesia"],
-    "L": ["Ukraine", "Honduras", "Uzbekistan", "Bahrain"],
+    "A": ["Mexico", "South Africa", "South Korea", "Czechia"],
+    "B": ["Canada", "Bosnia and Herzegovina", "Qatar", "Switzerland"],
+    "C": ["Brazil", "Morocco", "Haiti", "Scotland"],
+    "D": ["United States", "Paraguay", "Australia", "Turkey"],
+    "E": ["Germany", "Curaçao", "Ivory Coast", "Ecuador"],
+    "F": ["Netherlands", "Japan", "Sweden", "Tunisia"],
+    "G": ["Belgium", "Egypt", "Iran", "New Zealand"],
+    "H": ["Spain", "Cape Verde", "Saudi Arabia", "Uruguay"],
+    "I": ["France", "Senegal", "Iraq", "Norway"],
+    "J": ["Argentina", "Algeria", "Austria", "Jordan"],
+    "K": ["Portugal", "DR Congo", "Uzbekistan", "Colombia"],
+    "L": ["England", "Croatia", "Ghana", "Panama"],
 }
 
 
