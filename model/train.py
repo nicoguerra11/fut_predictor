@@ -11,6 +11,7 @@ Modelo:
 """
 
 import logging
+import os
 from pathlib import Path
 
 import arviz as az
@@ -27,10 +28,10 @@ MODEL_DIR = BASE_DIR / "model"
 POSTERIOR_PATH = MODEL_DIR / "posterior.nc"
 TEAMS_PATH = MODEL_DIR / "teams.csv"
 
-# Hiperparámetros del sampler
-DRAWS = 2000
-TUNE = 1000
-CHAINS = 4
+# Hiperparámetros del sampler — configurables via env vars para free tier
+DRAWS = int(os.getenv("MCMC_DRAWS", "2000"))
+TUNE = int(os.getenv("MCMC_TUNE", "1000"))
+CHAINS = int(os.getenv("MCMC_CHAINS", "4"))
 TARGET_ACCEPT = 0.9
 
 
