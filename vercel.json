@@ -4,7 +4,7 @@
   "outputDirectory": "frontend/dist",
   "framework": "vite",
   "rewrites": [
-    { "source": "/api/:path*", "destination": "https://world-cup-predictor-api.onrender.com/:path*" }
+    { "source": "/api/:path*", "destination": "https://fut-predictor.onrender.com/:path*" }
   ],
   "headers": [
     {
