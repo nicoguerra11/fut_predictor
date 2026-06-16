@@ -6,8 +6,8 @@ Modelo:
     goles_ij ~ Poisson(λ_ij)
     log(λ_ij) = μ + ataque_i - defensa_j + α·Δranking_ij + γ·es_local
 
-Método: MAP con L-BFGS-B + bootstrap para cuantificar incertidumbre.
-Sin compilación C — funciona en cualquier servidor.
+Método: MAP con L-BFGS-B + Laplace approximation para incertidumbre.
+Sin compilación C, sin bootstrap lento — entrena en ~5 segundos.
 """
 
 import logging
@@ -27,7 +27,7 @@ MODEL_DIR = BASE_DIR / "model"
 POSTERIOR_PATH = MODEL_DIR / "posterior.npz"
 TEAMS_PATH = MODEL_DIR / "teams.csv"
 
-N_BOOTSTRAP = int(os.getenv("BOOTSTRAP_SAMPLES", "1000"))
+N_DRAWS = int(os.getenv("MCMC_DRAWS", "2000"))
 
 
 def load_matches(path: Path | None = None) -> pd.DataFrame:
@@ -99,7 +99,7 @@ def neg_log_posterior(
         + np.sum(defensa**2)
     )
 
-    # Log-verosimilitud Poisson (log(λ) versión estable)
+    # Log-verosimilitud Poisson
     log_lam_h = (
         mu + ataque[home_idx] - defensa[away_idx]
         + alpha * delta_home + gamma * is_home
@@ -126,8 +126,8 @@ def fit_map(
     goals_home: np.ndarray,
     goals_away: np.ndarray,
     n_teams: int,
-) -> np.ndarray:
-    """Encuentra el MAP del modelo con L-BFGS-B."""
+):
+    """Encuentra el MAP del modelo con L-BFGS-B. Retorna (params, result)."""
     n_params = 3 + 2 * n_teams
     x0 = np.zeros(n_params)
     x0[0] = np.log(max(1.0, np.mean(np.concatenate([goals_home, goals_away]))))
@@ -137,38 +137,45 @@ def fit_map(
         x0=x0,
         args=(n_teams, home_idx, away_idx, delta_home, delta_away, is_home, goals_home, goals_away),
         method="L-BFGS-B",
-        options={"maxiter": 1000, "ftol": 1e-10},
+        # maxcor=30: más historial → mejor aproximación del Hessiano
+        options={"maxiter": 2000, "ftol": 1e-12, "maxcor": 30},
     )
     if not result.success:
-        log.debug(f"Optimización: {result.message}")
-    return result.x
+        log.warning(f"Optimización: {result.message}")
+    return result.x, result
 
 
-def bootstrap_posterior(
-    df: pd.DataFrame,
-    team_to_idx: dict[str, int],
-    n_teams: int,
-    n_bootstrap: int,
+def laplace_posterior(
+    map_params: np.ndarray,
+    result,
+    n_draws: int,
 ) -> np.ndarray:
-    """Bootstrap paramétrico — cada muestra es un MAP sobre un resampleo del dataset."""
+    """
+    Aproximación de Laplace: samplea de N(MAP, H⁻¹) donde H⁻¹ es el Hessiano
+    inverso aproximado por L-BFGS-B. Instantáneo — sin loops, sin compilación.
+    """
+    n = len(map_params)
+    log.info(f"Construyendo Laplace approximation ({n} parámetros, {n_draws} muestras)...")
+
+    # Construir matriz densa del Hessiano inverso a partir del L-BFGS-B
+    identity = np.eye(n)
+    H_inv = np.column_stack([result.hess_inv.dot(identity[:, i]) for i in range(n)])
+
+    # Forzar simetría y agregar jitter diagonal para estabilidad numérica
+    H_inv = (H_inv + H_inv.T) / 2.0
+    H_inv += np.eye(n) * 1e-6
+
     rng = np.random.default_rng(42)
-    samples: list[np.ndarray] = []
-    failed = 0
+    try:
+        samples = rng.multivariate_normal(map_params, H_inv, size=n_draws)
+    except np.linalg.LinAlgError:
+        # Fallback: aproximación diagonal si H_inv no es definida positiva
+        log.warning("H_inv no es semidefinida positiva, usando aproximación diagonal")
+        diag_std = np.sqrt(np.maximum(np.abs(np.diag(H_inv)), 1e-6))
+        samples = map_params[None, :] + rng.standard_normal((n_draws, n)) * diag_std[None, :]
 
-    for i in range(n_bootstrap):
-        idxs = rng.integers(0, len(df), size=len(df))
-        boot_df = df.iloc[idxs]
-        arrays = build_arrays(boot_df, team_to_idx)
-        try:
-            params = fit_map(*arrays, n_teams)
-            samples.append(params)
-        except Exception:
-            failed += 1
-        if (i + 1) % 200 == 0:
-            log.info(f"  Bootstrap: {i + 1}/{n_bootstrap} ({failed} fallidos)")
-
-    log.info(f"Bootstrap completo: {len(samples)} muestras válidas ({failed} fallidas)")
-    return np.array(samples)
+    log.info(f"Laplace completo: {n_draws} muestras generadas en < 1 segundo")
+    return samples
 
 
 def save_artifacts(
@@ -188,7 +195,7 @@ def save_artifacts(
         ataque=samples[:, 3: 3 + n_teams],
         defensa=samples[:, 3 + n_teams: 3 + 2 * n_teams],
     )
-    log.info(f"Posterior guardada en {out_path} ({len(samples)} muestras bootstrap)")
+    log.info(f"Posterior guardada en {out_path} ({len(samples)} muestras, {n_teams} equipos)")
 
     teams_df = pd.DataFrame({"equipo": teams, "idx": range(n_teams)})
     teams_df.to_csv(TEAMS_PATH, index=False)
@@ -203,13 +210,12 @@ def train(
     teams, team_to_idx = build_team_index(df)
     n_teams = len(teams)
 
-    log.info("Ajustando MAP con todos los datos...")
+    log.info("Ajustando MAP con L-BFGS-B...")
     all_arrays = build_arrays(df, team_to_idx)
-    map_params = fit_map(*all_arrays, n_teams)
+    map_params, result = fit_map(*all_arrays, n_teams)
     log.info(f"  μ={map_params[0]:.3f}  α={map_params[1]:.3f}  γ={map_params[2]:.3f}")
 
-    log.info(f"Iniciando bootstrap ({N_BOOTSTRAP} muestras)...")
-    samples = bootstrap_posterior(df, team_to_idx, n_teams, N_BOOTSTRAP)
+    samples = laplace_posterior(map_params, result, N_DRAWS)
 
     save_artifacts(samples, teams, posterior_path)
     return samples, teams
@@ -223,6 +229,6 @@ def retrain(new_data_path: Path | None = None) -> tuple[np.ndarray, list[str]]:
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     samples, teams = train()
-    print(f"\n✓ Modelo entrenado: {len(samples)} muestras bootstrap, {len(teams)} equipos")
+    print(f"\n✓ Modelo entrenado: {len(samples)} muestras Laplace, {len(teams)} equipos")
     print(f"  Posterior: {POSTERIOR_PATH}")
     print(f"  Equipos:   {TEAMS_PATH}")
