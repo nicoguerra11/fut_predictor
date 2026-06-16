@@ -212,21 +212,23 @@ class Predictor:
             int(np.quantile(simulated_away, 1 - alpha_tail)),
         )
 
-        # Resultado más probable (moda conjunta)
-        from collections import Counter
-        score_counts = Counter(zip(simulated_home.tolist(), simulated_away.tolist()))
-        most_likely = score_counts.most_common(1)[0][0]
+        # ── Marcadores y distribución usando λ media (no mezcla de Poisson) ──────
+        # Promediar 2000 distribuciones de Poisson con distinta λ infla P(0) por
+        # la desigualdad de Jensen: E[e^{-λ}] ≥ e^{-E[λ]}.
+        # Usar la λ media elimina ese artefacto y da marcadores más intuitivos.
+        mean_lam_h = float(np.mean(lambda_home))
+        mean_lam_a = float(np.mean(lambda_away))
 
         # Distribución de goles (0 a 8 para la UI)
         max_goals = 9
-        dist_home = [float(np.mean(simulated_home == g)) for g in range(max_goals)]
-        dist_away = [float(np.mean(simulated_away == g)) for g in range(max_goals)]
+        dist_home = [float(scipy_poisson.pmf(g, mean_lam_h)) for g in range(max_goals)]
+        dist_away = [float(scipy_poisson.pmf(g, mean_lam_a)) for g in range(max_goals)]
 
         # Grid de probabilidades 6×6 (marcadores exactos 0-0 a 5-5)
         goals_range = np.arange(6)
-        pmf_home_grid = scipy_poisson.pmf(goals_range[None, :], lambda_home[:, None])
-        pmf_away_grid = scipy_poisson.pmf(goals_range[None, :], lambda_away[:, None])
-        grid = np.einsum("ni,nj->ij", pmf_home_grid, pmf_away_grid) / len(lambda_home)
+        pmf_h = scipy_poisson.pmf(goals_range, mean_lam_h)
+        pmf_a = scipy_poisson.pmf(goals_range, mean_lam_a)
+        grid = np.outer(pmf_h, pmf_a)
         total_grid = grid.sum()
         scorelines = sorted(
             [
@@ -236,6 +238,10 @@ class Predictor:
             ],
             key=lambda x: -x["prob"],
         )
+
+        # Resultado más probable: argmax del grid
+        ml_idx = np.unravel_index(np.argmax(grid), grid.shape)
+        most_likely = (int(ml_idx[0]), int(ml_idx[1]))
 
         return MatchPrediction(
             team_home=team_home,
