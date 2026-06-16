@@ -1,16 +1,18 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import MatchPredictor from './components/MatchPredictor'
 import GroupTable from './components/GroupTable'
-import { TEAMS, TEAM_LOOKUP } from './data/teams'
+import { TEAMS } from './data/teams'
 import styles from './styles/App.module.css'
 
 const API_BASE = import.meta.env.VITE_API_URL || '/api'
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('predictor')
-  // Equipos disponibles en el modelo (filtrados por la API); fallback a todos los 48
   const [availableTeams, setAvailableTeams] = useState(TEAMS)
   const [apiError, setApiError] = useState(null)
+  const [modelInfo, setModelInfo] = useState(null)   // { last_trained, teams_in_model }
+  const [retraining, setRetraining] = useState(false)
+  const [retrainMsg, setRetrainMsg] = useState(null)
 
   useEffect(() => {
     fetch(`${API_BASE}/teams`)
@@ -18,19 +20,57 @@ export default function App() {
         if (!r.ok) throw new Error(`HTTP ${r.status}`)
         return r.json()
       })
-      .then((data) => {
-        const modelTeamNames = new Set(data.teams || [])
-        if (modelTeamNames.size > 0) {
-          // Siempre mostrar los 48 clasificados al Mundial 2026 (teams.js).
-          // Los equipos sin historial en 2014/2018/2022 usan el prior global del modelo.
-          setAvailableTeams(TEAMS)
-        }
+      .then(() => {
+        setAvailableTeams(TEAMS)
       })
       .catch((err) => {
-        // La API no está lista aún (modelo sin entrenar); se usa teams.js como fallback
         setApiError(err.message)
       })
+
+    // Cargar info del modelo (cuándo fue entrenado)
+    fetch(`${API_BASE}/admin/retrain/status`)
+      .then((r) => r.json())
+      .then((d) => setModelInfo(d))
+      .catch(() => {})
   }, [])
+
+  const handleRetrain = useCallback(() => {
+    setRetraining(true)
+    setRetrainMsg(null)
+    fetch(`${API_BASE}/admin/retrain`, { method: 'POST' })
+      .then((r) => r.json())
+      .then((d) => {
+        setRetrainMsg(d.message || 'Reentrenando...')
+        // Polling hasta que termine (~15 segundos)
+        const poll = setInterval(() => {
+          fetch(`${API_BASE}/admin/retrain/status`)
+            .then((r) => r.json())
+            .then((s) => {
+              setModelInfo(s)
+              if (!s.retrain_running) {
+                clearInterval(poll)
+                setRetraining(false)
+                setRetrainMsg('Modelo actualizado con los últimos resultados del Mundial.')
+              }
+            })
+            .catch(() => {
+              clearInterval(poll)
+              setRetraining(false)
+            })
+        }, 3000)
+      })
+      .catch(() => {
+        setRetraining(false)
+        setRetrainMsg('Error al conectar con el backend.')
+      })
+  }, [])
+
+  const lastTrained =
+    modelInfo?.last_trained === 'build'
+      ? 'al deployar'
+      : modelInfo?.last_trained
+        ? new Date(modelInfo.last_trained).toLocaleString('es-AR')
+        : null
 
   return (
     <div className={styles.app}>
@@ -61,7 +101,30 @@ export default function App() {
       <main className={styles.main}>
         {apiError && (
           <div className={styles.errorBanner}>
-            Backend no disponible: {apiError}. El predictor usa datos locales; las predicciones requieren el modelo entrenado.
+            Backend no disponible: {apiError}. Las predicciones requieren el modelo entrenado.
+          </div>
+        )}
+
+        {/* Barra de actualización del modelo */}
+        {!apiError && (
+          <div className={styles.retrainBar}>
+            <div className={styles.retrainInfo}>
+              {lastTrained && (
+                <span className={styles.retrainTimestamp}>
+                  Modelo entrenado {lastTrained}
+                </span>
+              )}
+              {retrainMsg && (
+                <span className={styles.retrainMsg}>{retrainMsg}</span>
+              )}
+            </div>
+            <button
+              className={styles.retrainBtn}
+              onClick={handleRetrain}
+              disabled={retraining}
+            >
+              {retraining ? 'Actualizando...' : 'Actualizar con resultados del Mundial'}
+            </button>
           </div>
         )}
 

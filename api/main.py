@@ -6,12 +6,13 @@ La posterior se carga una sola vez al arrancar (lifespan event).
 
 import logging
 import os
+from concurrent.futures import ThreadPoolExecutor
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 from pathlib import Path
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException
+from fastapi import BackgroundTasks, FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from api.schemas import (
@@ -51,9 +52,12 @@ WC_2026_GROUPS: dict[str, list[str]] = {
 class AppState:
     predictor: Predictor | None = None
     model_loaded: bool = False
+    last_trained: str = "build"  # timestamp ISO o "build" si viene del deploy
+    retrain_running: bool = False
 
 
 state = AppState()
+_retrain_executor = ThreadPoolExecutor(max_workers=1)
 
 
 @asynccontextmanager
@@ -230,3 +234,77 @@ async def get_standings() -> StandingsResponse:
             )
 
     return StandingsResponse(standings=standings, last_updated=timestamp)
+
+
+# ── Reentrenamiento en vivo ───────────────────────────────────────────────────
+
+def _do_retrain() -> None:
+    """
+    Descarga el CSV actualizado de martj42 (incluye resultados del WC 2026
+    que se hayan jugado) y reentrena el modelo Laplace en ~15 segundos.
+    Actualiza el estado global; el próximo /predict usa el modelo nuevo.
+    """
+    try:
+        log.info("=== Reentrenamiento iniciado ===")
+        state.retrain_running = True
+
+        from data.fetch_data import fetch_all_data
+        from model.train import train
+
+        fetch_all_data()
+        train()
+
+        new_predictor = Predictor()
+        new_predictor._load()
+        state.predictor = new_predictor
+        state.model_loaded = True
+        state.last_trained = datetime.now(timezone.utc).isoformat()
+        log.info(f"=== Reentrenamiento completado: {state.last_trained} ===")
+    except Exception:
+        log.exception("Error durante el reentrenamiento")
+    finally:
+        state.retrain_running = False
+
+
+@app.post("/admin/retrain", tags=["Admin"])
+async def retrain(
+    background_tasks: BackgroundTasks,
+    x_admin_key: str = Header(default=""),
+) -> dict:
+    """
+    Vuelve a descargar los resultados del CSV de martj42 (que se actualiza
+    con los partidos del Mundial 2026 mientras se juegan) y reentrena el
+    modelo en background (~15s). Las predicciones mejoran automáticamente
+    con cada resultado nuevo.
+
+    Protegido con la variable de entorno ADMIN_KEY (si no está seteada,
+    acepta cualquier request — solo para desarrollo).
+    """
+    admin_key = os.getenv("ADMIN_KEY", "")
+    if admin_key and x_admin_key != admin_key:
+        raise HTTPException(status_code=403, detail="Clave de administrador incorrecta")
+    if state.retrain_running:
+        return {"status": "already_running", "message": "Ya hay un reentrenamiento en curso"}
+
+    background_tasks.add_task(_do_retrain)
+    return {
+        "status": "started",
+        "message": "Reentrenando con los últimos resultados del Mundial 2026. Listo en ~15 segundos.",
+    }
+
+
+@app.get("/admin/retrain/status", tags=["Admin"])
+async def retrain_status() -> dict:
+    """Estado del modelo: cuándo se entrenó y cuántos partidos incorporó."""
+    teams_count = 0
+    if state.model_loaded and state.predictor is not None:
+        try:
+            teams_count = len(state.predictor.get_teams())
+        except Exception:
+            pass
+    return {
+        "model_loaded": state.model_loaded,
+        "retrain_running": state.retrain_running,
+        "last_trained": state.last_trained,
+        "teams_in_model": teams_count,
+    }
