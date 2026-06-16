@@ -10,42 +10,75 @@
 
 .subtitle {
   color: var(--color-text-muted);
-  margin-bottom: 2rem;
-  font-size: 0.95rem;
+  margin-bottom: 1.25rem;
+  font-size: 0.9rem;
 }
 
-.loading,
-.error {
-  text-align: center;
-  padding: 3rem;
+/* ── Selector de grupo A–L ───────────────────────────────────────────────── */
+.selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 1.5rem;
+}
+
+.selectorBtn {
+  min-width: 38px;
+  height: 38px;
+  padding: 0 0.6rem;
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 600;
   color: var(--color-text-muted);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
 }
 
-.error { color: var(--color-danger); }
+.selectorBtn:hover {
+  border-color: var(--color-header);
+  color: var(--color-header);
+}
 
+.selectorBtnActive {
+  background: var(--color-header);
+  border-color: var(--color-header);
+  color: #fff;
+}
+
+/* ── Grid ────────────────────────────────────────────────────────────────── */
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1rem;
 }
 
+.gridSingle {
+  grid-template-columns: 1fr;
+  max-width: 500px;
+}
+
+/* ── Tarjeta de grupo ────────────────────────────────────────────────────── */
 .groupCard {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
   overflow: hidden;
+  box-shadow: var(--shadow);
 }
 
 .groupHeader {
-  background: var(--color-primary);
+  background: var(--color-header);
   color: #fff;
   font-weight: 700;
-  font-size: 0.9rem;
-  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  padding: 0.55rem 1rem;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
 }
 
+/* ── Tabla ───────────────────────────────────────────────────────────────── */
 .table {
   width: 100%;
   border-collapse: collapse;
@@ -53,19 +86,20 @@
 }
 
 .table th {
-  padding: 0.5rem 0.75rem;
+  padding: 0.45rem 0.75rem;
   text-align: left;
   color: var(--color-text-muted);
-  font-size: 0.75rem;
-  font-weight: 600;
+  font-size: 0.72rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
   border-bottom: 1px solid var(--color-border);
 }
 
 .table td {
-  padding: 0.5rem 0.75rem;
-  border-bottom: 1px solid rgba(55, 65, 81, 0.5);
+  padding: 0.55rem 0.75rem;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text);
 }
 
 .table tr:last-child td {
@@ -76,13 +110,27 @@
   border-left: 3px solid var(--color-success);
 }
 
+/* ── Celdas ──────────────────────────────────────────────────────────────── */
 .teamCell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   font-weight: 500;
 }
 
+.flag {
+  font-size: 1rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
 .predicted {
-  color: var(--color-primary);
-  font-weight: 600;
+  color: var(--color-header);
+  font-weight: 700;
+}
+
+.probCol {
+  min-width: 80px;
 }
 
 .probCell {
@@ -92,16 +140,61 @@
 }
 
 .probBar {
-  height: 6px;
-  background: var(--color-primary);
+  height: 5px;
+  background: var(--color-header);
   border-radius: 999px;
-  max-width: 60px;
+  max-width: 50px;
   min-width: 2px;
-  transition: width 0.5s ease;
+  transition: width 0.4s ease;
 }
 
 .probCell span {
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   color: var(--color-text-muted);
   min-width: 28px;
+}
+
+/* ── Shimmer (loading) ───────────────────────────────────────────────────── */
+.shimmer {
+  display: inline-block;
+  width: 32px;
+  height: 12px;
+  background: linear-gradient(90deg, var(--color-border) 25%, #f0f0f0 50%, var(--color-border) 75%);
+  background-size: 200% 100%;
+  border-radius: 4px;
+  animation: shimmer 1.2s infinite;
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0 }
+  100% { background-position: -200% 0 }
+}
+
+/* ── Hint ────────────────────────────────────────────────────────────────── */
+.hint {
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: 0.82rem;
+  margin-top: 1.25rem;
+}
+
+/* ── States ──────────────────────────────────────────────────────────────── */
+.loading,
+.error {
+  text-align: center;
+  padding: 3rem;
+  color: var(--color-text-muted);
+}
+
+.error { color: var(--color-danger); }
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .gridSingle {
+    max-width: 100%;
+  }
 }
