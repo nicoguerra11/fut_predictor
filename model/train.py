@@ -41,7 +41,7 @@ def load_matches(path: Path | None = None) -> pd.DataFrame:
         "equipo_local", "equipo_visitante",
         "goles_local", "goles_visitante",
         "ranking_local", "ranking_visitante",
-        "fase",
+        "es_local",
     }
     missing = required - set(df.columns)
     if missing:
@@ -66,7 +66,8 @@ def build_arrays(
     away_idx = df["equipo_visitante"].map(team_to_idx).to_numpy()
     delta_home = ((df["ranking_visitante"] - df["ranking_local"]) / 50.0).to_numpy()
     delta_away = ((df["ranking_local"] - df["ranking_visitante"]) / 50.0).to_numpy()
-    is_home = (df["fase"] == "grupos").astype(float).to_numpy()
+    # es_local: True en clasificatorias/torneos con sede local; False en sedes neutrales (WC)
+    is_home = df["es_local"].astype(float).to_numpy()
     goals_home = df["goles_local"].to_numpy()
     goals_away = df["goles_visitante"].to_numpy()
     return home_idx, away_idx, delta_home, delta_away, is_home, goals_home, goals_away
