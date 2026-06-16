@@ -178,8 +178,14 @@ class Predictor:
             + samples["alpha"] * delta_away
         )
 
-        lambda_home = np.exp(np.clip(log_lambda_home, -10, 10))
-        lambda_away = np.exp(np.clip(log_lambda_away, -10, 10))
+        # Limitar al rango real del fútbol internacional: λ ∈ [0.22, 4.5]
+        # La aproximación de Laplace puede generar outliers extremos (λ=50+)
+        # que distorsionan el promedio y el heatmap. log(4.5) ≈ 1.5.
+        log_lambda_home = np.clip(log_lambda_home, -1.5, 1.5)
+        log_lambda_away = np.clip(log_lambda_away, -1.5, 1.5)
+
+        lambda_home = np.exp(log_lambda_home)
+        lambda_away = np.exp(log_lambda_away)
 
         # Simular goles desde Poisson
         rng2 = np.random.default_rng(seed=0)
@@ -191,9 +197,9 @@ class Predictor:
         prob_draw = float(np.mean(simulated_home == simulated_away))
         prob_away = float(np.mean(simulated_home < simulated_away))
 
-        # Goles esperados
-        expected_home = float(np.mean(simulated_home))
-        expected_away = float(np.mean(simulated_away))
+        # Goles esperados: usar mean(λ), no mean(simulados), para mayor estabilidad
+        expected_home = float(np.mean(lambda_home))
+        expected_away = float(np.mean(lambda_away))
 
         # Intervalo de credibilidad 89%
         alpha_tail = (1.0 - CREDIBLE_INTERVAL) / 2
