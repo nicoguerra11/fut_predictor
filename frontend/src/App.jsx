@@ -21,13 +21,9 @@ export default function App() {
       .then((data) => {
         const modelTeamNames = new Set(data.teams || [])
         if (modelTeamNames.size > 0) {
-          // Mantener el orden por ranking, filtrar a los que conoce el modelo
-          const filtered = TEAMS.filter((t) => modelTeamNames.has(t.name))
-          // Si el modelo conoce equipos que no están en teams.js, agregarlos sin bandera
-          const extras = [...modelTeamNames]
-            .filter((n) => !TEAM_LOOKUP[n])
-            .map((n) => ({ name: n, flag: '🏴', fifaRanking: 999 }))
-          setAvailableTeams([...filtered, ...extras])
+          // Siempre mostrar los 48 clasificados al Mundial 2026 (teams.js).
+          // Los equipos sin historial en 2014/2018/2022 usan el prior global del modelo.
+          setAvailableTeams(TEAMS)
         }
       })
       .catch((err) => {
@@ -78,7 +74,7 @@ export default function App() {
       </main>
 
       <footer className={styles.footer}>
-        Modelo de Poisson jerárquico bayesiano · PyMC 5 · Mundial 2026
+        Modelo de Poisson jerárquico bayesiano · Mundial 2026
       </footer>
     </div>
   )
