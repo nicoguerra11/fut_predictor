@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import ResultDisplay from './ResultDisplay'
+import TeamSelect from './TeamSelect'
 import styles from './MatchPredictor.module.css'
 
 export default function MatchPredictor({ teams, apiBase }) {
@@ -45,21 +46,12 @@ export default function MatchPredictor({ teams, apiBase }) {
       {/* ── Selectores de equipos ─────────────────────────────────────── */}
       <div className={styles.teamsRow}>
         <div className={styles.teamBlock}>
-          <label className={styles.label}>Local</label>
-          <div className={styles.selectWrapper}>
-            <select
-              className={styles.select}
-              value={teamHome}
-              onChange={(e) => { setTeamHome(e.target.value); setResult(null) }}
-            >
-              <option value="">— Seleccioná —</option>
-              {teams.map((t) => (
-                <option key={t.name} value={t.name}>
-                  {t.flag} {t.name}
-                </option>
-              ))}
-            </select>
-          </div>
+          <span className={styles.label}>Local</span>
+          <TeamSelect
+            teams={teams}
+            value={teamHome}
+            onChange={(name) => { setTeamHome(name); setResult(null) }}
+          />
           {teamHomeObj && (
             <div className={styles.rankPill}>
               🏆 Ranking FIFA #{teamHomeObj.fifaRanking}
@@ -70,21 +62,12 @@ export default function MatchPredictor({ teams, apiBase }) {
         <div className={styles.vsLabel}>VS</div>
 
         <div className={styles.teamBlock}>
-          <label className={styles.label}>Visitante</label>
-          <div className={styles.selectWrapper}>
-            <select
-              className={styles.select}
-              value={teamAway}
-              onChange={(e) => { setTeamAway(e.target.value); setResult(null) }}
-            >
-              <option value="">— Seleccioná —</option>
-              {teams.map((t) => (
-                <option key={t.name} value={t.name}>
-                  {t.flag} {t.name}
-                </option>
-              ))}
-            </select>
-          </div>
+          <span className={styles.label}>Visitante</span>
+          <TeamSelect
+            teams={teams}
+            value={teamAway}
+            onChange={(name) => { setTeamAway(name); setResult(null) }}
+          />
           {teamAwayObj && (
             <div className={styles.rankPill}>
               🏆 Ranking FIFA #{teamAwayObj.fifaRanking}

@@ -1,0 +1,197 @@
+/* ── Root ───────────────────────────────────────────────────────────────── */
+.root {
+  position: relative;
+  width: 100%;
+}
+
+/* ── Trigger (closed state) ─────────────────────────────────────────────── */
+.trigger {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 0.85rem;
+  height: 44px;
+  background: var(--color-surface-2);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  user-select: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.trigger:hover:not(.triggerDisabled) {
+  border-color: #94a3b8;
+}
+
+.triggerOpen {
+  border-color: var(--color-header);
+  box-shadow: 0 0 0 3px rgba(26, 26, 46, 0.1);
+  background: var(--color-surface);
+}
+
+.triggerDisabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Search input (shown when open) ─────────────────────────────────────── */
+.searchInput {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 0.9rem;
+  color: var(--color-text);
+  outline: none;
+  min-width: 0;
+  font-family: inherit;
+}
+
+.searchInput::placeholder {
+  color: var(--color-text-muted);
+}
+
+/* ── Placeholder / Selected label ───────────────────────────────────────── */
+.placeholder {
+  flex: 1;
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.selectedLabel {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.selectedFlag {
+  font-size: 1.1rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.selectedName {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Chevron icon ───────────────────────────────────────────────────────── */
+.chevron {
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+  transition: transform 0.15s ease;
+}
+
+.chevronUp {
+  transform: rotate(180deg);
+  color: var(--color-header);
+}
+
+/* ── Dropdown list ──────────────────────────────────────────────────────── */
+.dropdown {
+  position: absolute;
+  top: calc(100% + 5px);
+  left: 0;
+  right: 0;
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
+  max-height: 232px;
+  overflow-y: auto;
+  z-index: 40;
+  animation: dropIn 0.12s ease;
+}
+
+@keyframes dropIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdown::-webkit-scrollbar {
+  width: 4px;
+}
+
+.dropdown::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.dropdown::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 4px;
+}
+
+/* ── Option items ───────────────────────────────────────────────────────── */
+.option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.55rem 0.9rem;
+  cursor: pointer;
+  transition: background 0.1s;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.option:last-child {
+  border-bottom: none;
+}
+
+.optionHighlighted {
+  background: var(--color-surface-2);
+}
+
+.optionSelected {
+  background: rgba(26, 26, 46, 0.05);
+}
+
+.optionSelected .optionName {
+  font-weight: 700;
+  color: var(--color-header);
+}
+
+.optionName {
+  font-size: 0.875rem;
+  color: var(--color-text);
+  line-height: 1.3;
+}
+
+.optionRank {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: var(--color-text-muted);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.optionSelected .optionRank {
+  background: rgba(26, 26, 46, 0.08);
+  border-color: rgba(26, 26, 46, 0.15);
+  color: var(--color-header);
+}
+
+/* ── Empty state ────────────────────────────────────────────────────────── */
+.empty {
+  padding: 1rem 0.9rem;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  text-align: center;
+}
