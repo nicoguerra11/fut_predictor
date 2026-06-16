@@ -18,7 +18,13 @@ function useGroupPredictions(teams, apiBase, enabled) {
         fetch(`${apiBase}/predict`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ team_home: home, team_away: away, neutral: true }),
+          body: JSON.stringify({
+            team_home: home,
+            team_away: away,
+            neutral: true,
+            ranking_home: TEAM_LOOKUP[home]?.fifaRanking ?? null,
+            ranking_away: TEAM_LOOKUP[away]?.fifaRanking ?? null,
+          }),
         }).then((r) => r.json())
       )
     )

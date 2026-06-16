@@ -92,12 +92,15 @@ def neg_log_posterior(
     defensa = params[3 + n_teams: 3 + 2 * n_teams]
 
     # Prior gaussiano (regularización L2)
+    # σ_alpha=1.0 (antes 0.5) — permite que el modelo aprenda
+    # efectos de ranking más grandes si los datos lo justifican.
+    # σ_ataque/defensa=1.2 — más margen para diferenciar equipos de distinto nivel.
     log_prior = -0.5 * (
         mu**2
-        + (alpha / 0.5) ** 2
+        + (alpha / 1.0) ** 2
         + gamma**2
-        + np.sum(ataque**2)
-        + np.sum(defensa**2)
+        + np.sum((ataque / 1.2) ** 2)
+        + np.sum((defensa / 1.2) ** 2)
     )
 
     # Log-verosimilitud Poisson

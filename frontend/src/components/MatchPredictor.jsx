@@ -25,7 +25,13 @@ export default function MatchPredictor({ teams, apiBase }) {
     fetch(`${apiBase}/predict`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ team_home: teamHome, team_away: teamAway, neutral }),
+      body: JSON.stringify({
+        team_home: teamHome,
+        team_away: teamAway,
+        neutral,
+        ranking_home: teamHomeObj?.fifaRanking ?? null,
+        ranking_away: teamAwayObj?.fifaRanking ?? null,
+      }),
     })
       .then((r) => {
         if (!r.ok) return r.json().then((e) => { throw new Error(e.detail || `Error HTTP ${r.status}`) })
