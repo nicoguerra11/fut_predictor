@@ -30,9 +30,7 @@ TEAMS_PATH = MODEL_DIR / "teams.csv"
 
 # Hiperparámetros del sampler — configurables via env vars para free tier
 DRAWS = int(os.getenv("MCMC_DRAWS", "2000"))
-TUNE = int(os.getenv("MCMC_TUNE", "1000"))
-CHAINS = int(os.getenv("MCMC_CHAINS", "4"))
-TARGET_ACCEPT = 0.9
+ADVI_ITERS = int(os.getenv("ADVI_ITERATIONS", "30000"))
 
 
 def load_matches(path: Path | None = None) -> pd.DataFrame:
@@ -159,19 +157,15 @@ def build_model(arrays: dict[str, np.ndarray], n_teams: int) -> pm.Model:
 
 
 def sample_posterior(model: pm.Model) -> az.InferenceData:
-    """Ejecuta MCMC con NUTS y retorna el InferenceData."""
-    log.info(f"Iniciando sampling: {CHAINS} cadenas × {DRAWS} draws (tune={TUNE})")
+    """Ejecuta ADVI y muestrea la aproximación. Mucho más rápido que NUTS en free tier."""
+    log.info(f"Iniciando ADVI ({ADVI_ITERS} iteraciones, luego {DRAWS} muestras)...")
     with model:
-        idata = pm.sample(
-            draws=DRAWS,
-            tune=TUNE,
-            chains=CHAINS,
-            target_accept=TARGET_ACCEPT,
-            return_inferencedata=True,
-            progressbar=True,
+        approx = pm.fit(
+            n=ADVI_ITERS,
+            method="advi",
+            progressbar=False,
         )
-        pm.sample_posterior_predictive(idata, extend_inferencedata=True)
-
+        idata = approx.sample(draws=DRAWS)
     return idata
 
 
@@ -203,15 +197,11 @@ def train(data_path: Path | None = None, posterior_path: Path | None = None) -> 
 
     save_artifacts(idata, teams, posterior_path)
 
-    # Diagnósticos básicos
-    summary = az.summary(idata, var_names=["mu", "alpha", "gamma", "sigma_ataque", "sigma_defensa"])
-    log.info(f"\nResumen de parámetros globales:\n{summary}")
-
-    r_hat_max = float(summary["r_hat"].max())
-    if r_hat_max > 1.05:
-        log.warning(f"R̂ máximo = {r_hat_max:.3f} > 1.05 — considerar más muestras o reparametrización")
-    else:
-        log.info(f"Convergencia OK (R̂ máximo = {r_hat_max:.3f})")
+    # Diagnósticos básicos (ADVI tiene 1 cadena; R̂ no aplica)
+    posterior = idata.posterior
+    for var in ["mu", "alpha", "gamma"]:
+        vals = posterior[var].values.flatten()
+        log.info(f"  {var}: media={vals.mean():.3f}, std={vals.std():.3f}")
 
     return idata
 
